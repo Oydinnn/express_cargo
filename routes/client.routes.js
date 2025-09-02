@@ -10,9 +10,9 @@ const router = require("express").Router();
 
 router.post('/', CreateClient)
 router.get('/', GetAllClient)
-router.get('/', GetOneClient)
-router.put('/', UpdateClient)
-router.delete('/', DeleteClient)
+router.get('/:id', GetOneClient)
+router.put('/:id', UpdateClient)
+router.delete('/:id', DeleteClient)
 
 
 module.exports = router;

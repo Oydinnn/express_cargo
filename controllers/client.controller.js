@@ -2,8 +2,7 @@ const Client = require("../models/client");
 
 const CreateClient = async (req, res) => {
   try {
-    console.log("Try started"); // test uchun
-    const { full_name, phone_number, email, address, location } = req.body;
+    const { full_name, phone_number, email, address, location, clientId } = req.body;
 
     const candidate = await Client.findOne({ where: { email } });
     if (candidate) {
@@ -16,6 +15,7 @@ const CreateClient = async (req, res) => {
       email,
       address,
       location,
+      clientId,
     });
 
     res.status(201).send({
@@ -49,15 +49,22 @@ const GetOneClient = async (req, res) => {
 
     const client = await Client.findByPk(id);
 
+    if (!client) {
+      return res.status(404).send({
+        message: "Client not found",
+      });
+    }
+
     res.status(200).send({
-      message: "Client fetched successfuly",
+      message: "Client fetched successfully",
       data: client,
     });
   } catch (err) {
     console.log(err);
-    res.status(500).send({ error: "Client fetched error" });
+    res.status(500).send({ error: "Client fetch error" });
   }
 };
+
 
 const UpdateClient = async (req, res) => {
   try {
@@ -85,7 +92,7 @@ const DeleteClient = async (req, res) => {
 
     const client = await Client.destroy({ where: {id} });
 
-    res.status(204).send({
+    res.status(202).send({
       message: "Client deleted successfuly",
       data: client,
     });
