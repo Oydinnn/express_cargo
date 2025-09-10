@@ -1,19 +1,39 @@
+const { sendErrorResponse } = require("../helpers/send.error.response");
 const Admin = require("../models/admin");
 const Order = require("../models/order");
+const bcrypt = require("bcrypt");
 
-const CreateAdmin = async (req, res) => {
+const createAdmin = async (req, res) => {
   try {
-    const { full_name, user_name, password, phone_number, email, desc} = req.body;
+    const {
+      full_name,
+      user_name,
+      password,
+      confirm_password,
+      phone_number,
+      email,
+      desc,
+    } = req.body;
 
     const candidate = await Admin.findOne({ where: { email } });
     if (candidate) {
-      return res.status(403).send({ message: "Bunday foydalanuvchi mavjud" });
+      return sendErrorResponse(
+        { message: "Bunday foydalanuvchi mavjud" },
+        res,
+        403
+      );
     }
+
+    if (password !== confirm_password) {
+      return sendErrorResponse({ message: "Parollar mosmas" }, res, 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 7);
 
     const newAdmin = await Admin.create({
       full_name,
       user_name,
-      password,
+      password: hashedPassword,
       phone_number,
       email,
       desc,
@@ -24,19 +44,17 @@ const CreateAdmin = async (req, res) => {
       data: newAdmin,
     });
   } catch (err) {
-    console.error("Catch worked! Error:", err); // 👈 to‘liq chiqadi
-    res.status(500).send({ error: "Created Admin error", details: err.message });
+    sendErrorResponse(err, res, 500);
   }
 };
 
-
-const GetAllAdmin = async (req, res) => {
+const getAllAdmin = async (req, res) => {
   try {
     const Admins = await Admin.findAll({
       include: [
         {
           model: Order,
-          through: {attributes: ["operation_date"]},
+          through: { attributes: ["operation_date"] },
         },
       ],
     });
@@ -51,13 +69,13 @@ const GetAllAdmin = async (req, res) => {
   }
 };
 
-const GetOneAdmin = async (req, res) => {
+const getOneAdmin = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const Admin = await Admin.findByPk(id);
+    const admin = await Admin.findByPk(id);
 
-    if (!Admin) {
+    if (!admin) {
       return res.status(404).send({
         message: "Admin not found",
       });
@@ -65,7 +83,7 @@ const GetOneAdmin = async (req, res) => {
 
     res.status(200).send({
       message: "Admin fetched successfully",
-      data: Admin,
+      data: admin,
     });
   } catch (err) {
     console.log(err);
@@ -73,8 +91,7 @@ const GetOneAdmin = async (req, res) => {
   }
 };
 
-
-const UpdateAdmin = async (req, res) => {
+const updateAdmin = async (req, res) => {
   try {
     const body = req.body;
     const { id } = req.params;
@@ -94,11 +111,11 @@ const UpdateAdmin = async (req, res) => {
   }
 };
 
-const DeleteAdmin = async (req, res) => {
+const deleteAdmin = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const Admin = await Admin.destroy({ where: {id} });
+    const Admin = await Admin.destroy({ where: { id } });
 
     res.status(202).send({
       message: "Admin deleted successfuly",
@@ -110,9 +127,9 @@ const DeleteAdmin = async (req, res) => {
 };
 
 module.exports = {
-  CreateAdmin,
-  GetAllAdmin,
-  GetOneAdmin,
-  UpdateAdmin,
-  DeleteAdmin,
+  createAdmin,
+  getAllAdmin,
+  getOneAdmin,
+  updateAdmin,
+  deleteAdmin,
 };

@@ -14,7 +14,7 @@ const Admin = sequelize.define("admin", {
         type: DataTypes.STRING(50),
     },
   password: {
-    type: DataTypes.STRING(30)
+    type: DataTypes.STRING(255)
   },
   phone_number: {
     type: DataTypes.STRING,
@@ -24,7 +24,7 @@ const Admin = sequelize.define("admin", {
     },
   },
   email: {
-    type: DataTypes.STRING(30)
+    type: DataTypes.STRING(50)
   },
   desc: {
     type: DataTypes.STRING,
@@ -36,6 +36,9 @@ const Admin = sequelize.define("admin", {
   is_creator: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
+  },
+  refresh_token: {
+    type: DataTypes.STRING
   }
 });
 

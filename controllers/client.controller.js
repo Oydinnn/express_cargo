@@ -1,4 +1,7 @@
 const Client = require("../models/client");
+const { Op } = require("sequelize");
+const Order = require("../models/order");
+
 
 const CreateClient = async (req, res) => {
   try {
@@ -31,8 +34,20 @@ const CreateClient = async (req, res) => {
 
 const GetAllClient = async (req, res) => {
   try {
-    const clients = await Client.findAll();
-
+    const clients = await Client.findAll({
+       include: [
+        {
+          model: Order, 
+          as: 'orders',
+          where: {
+            createAt: {
+              [Op.between]: [new Date(startDate), new Date(endDate)],
+            }
+          }
+        }
+      ]
+    }
+    );
     res.status(200).send({
       message: "Clients fetched successfuly",
       data: clients,

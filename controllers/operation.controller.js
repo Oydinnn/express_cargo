@@ -1,4 +1,6 @@
 const Operation = require("../models/operation")
+const Client = require("../models/client");
+
 
 const addOperation = async (req, res) => {
   try {
@@ -33,7 +35,7 @@ const GetAllOperation = async (req, res) => {
       attributes: ['full_name', "email"],
       },
     ], 
-    attributes: ["product_link", "sum"]
+    // attributes: ["product_link", "sum"]
     });
 
     res.status(200).send({
